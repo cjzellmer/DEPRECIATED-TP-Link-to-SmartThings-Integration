@@ -1,0 +1,20 @@
+These instructions are intended to provide quick upgrade instructions.
+
+Assumption.  You have previously installed the TP-Link Bulb or TP-Link Plug and device handler.
+
+1.  Copy the files in the directory to a new directory on your PC.
+2.  Edit the "TPLinkIoTServerStart.bat" to identify the path to your server.
+3.  Open the appropriate ".groovy" file and copy the contents to your clipboard.
+4.  Log in to SmartThings IDE, then go to "My Device Handlers".
+5.  Open the CURRENT device handler.  Select the text and delete it. Then paste
+    the text from your clipboard into the window.
+6.  Go to the bottom and click the “Create” button.
+7.  On the next page that opens, click “Publish”, then “For Me” near the 
+    top-right of the page.
+8.  For existing bulbs, add the Device IP (deviceIP).  This is the same as
+    previously used. Use either the ST IDE or the smart phone 
+    ST App.
+9.  Set the new *.bat file to auto start and remove the previous *.bat file 
+    from auto start.
+    (see the full Readme.md file for ways to do this).
+
