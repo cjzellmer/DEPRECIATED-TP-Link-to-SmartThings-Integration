@@ -6,15 +6,11 @@ c.  return the response raw data to the SmartThings from the TP-Link Device.
 History:
 03-13-2017 - Initial release with name TP-LinkServerLite.js
 */
-
 var http = require('http')
 var net = require('net')
 var server = http.createServer(onRequest)
 server.listen(8082) // port must be same as in "sendCmdtoServer" of groovy files.
-
 console.log("TP-Link Server - Lite Edition")
-
-//	-------------------------------------------------------------------
 function onRequest(request, response){
 	var msg = ''
 	var deviceIP = request.headers["tplink-iot-ip"]
@@ -24,7 +20,6 @@ function onRequest(request, response){
 	console.log(date)
 	console.log("Sending to IP address: " + deviceIP + " Command: " + command)
 	sendCmd(command)
-//	-------------------------------------------------------------------
 	function sendCmd(command) {
 		return new Promise((resolve, reject) => {
 		var socket = send(command)
@@ -56,7 +51,6 @@ function onRequest(request, response){
 		})
 		return
 	}
-//	-------------------------------------------------------------------
 	function send(payload) {
 		var socket = net.connect(9999, deviceIP)
 		socket.setKeepAlive(false)
@@ -72,19 +66,17 @@ function onRequest(request, response){
 		})
 		return socket
 	}
-//	-------------------------------------------------------------------
 	function encrypt(input) {
-		var buf = Buffer.alloc(input.length); // node v6: Buffer.alloc(input.length)
+		var buf = Buffer.alloc(input.length)
 		var key = 0xAB
 		for (var i = 0; i < input.length; i++) {
 			buf[i] = input.charCodeAt(i) ^ key
 			key = buf[i]
 		}
-		var bufLength = Buffer.alloc(4); // node v6: Buffer.alloc(4)
+		var bufLength = Buffer.alloc(4)
 		bufLength.writeUInt32BE(input.length, 0)
 		return Buffer.concat([bufLength, buf], input.length + 4)
 	}
-//	-------------------------------------------------------------------
 	function decrypt(input, firstKey) {
 		var buf = Buffer.from(input)
 		var key = 0x2B
