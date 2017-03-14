@@ -28,7 +28,6 @@ Notes:
 Update History
 	03/12/2017 - Created initial rendition.  Version 1.0
 */
-//	-----------------------------------------------------------------------
 metadata {
 	definition (name: "TP-Link_LB-130_Lite", namespace: "V1.0", author: "Dave Gutheinz") {
 		capability "Switch"
@@ -77,42 +76,34 @@ metadata {
 		details(["switch", "colorTempSliderControl", "bulbMode", "colorTemp", "refresh"])
     }
 }
-//	----------------------------------------------------------------------
 preferences {
 	input("deviceIP", "text", title: "Device IP", required: true, displayDuringSetup: true)
 	input("gatewayIP", "text", title: "Gateway IP", required: true, displayDuringSetup: true)
 }
-//	----------------------------------------------------------------------
 def on() {
 	log.info "${device.name} ${device.label}: Turning ON"
 	sendCmdtoServer('{"smartlife.iot.smartbulb.lightingservice": {"transition_light_state": {"on_off": 1}}}', "hubActionResponse")
 }
-//	----------------------------------------------------------------------
 def off() {
 	log.info "${device.name} ${device.label}: Turning OFF"
 	sendCmdtoServer('{"smartlife.iot.smartbulb.lightingservice": {"transition_light_state": {"on_off": 0}}}', "hubActionResponse")
 }
-//	----------------------------------------------------------------------
 def setLevel(percentage) {
 	log.info "${device.name} ${device.label}: Setting Brightness to " + percentage
 	complexCmd('{"smartlife.iot.smartbulb.lightingservice": {"transition_light_state": {"brightness": ' + percentage + '}}}')
 }
-//	----------------------------------------------------------------------
 def setColorTemperature(kelvin) {
 	log.info "${device.name} ${device.label}: Setting Color Temperature to " + kelvin
     complexCmd('{"smartlife.iot.smartbulb.lightingservice": {"transition_light_state": {"color_temp": ' + kelvin + '}}}')
 }
-//	----------------------------------------------------------------------
 def setModeNormal() {
 	log.info "${device.name} ${device.label}: Changing Mode to NORMAL"
     sendCmdtoServer('{"smartlife.iot.smartbulb.lightingservice": {"transition_light_state": {"mode": "normal"}}}', "hubActionResponse")
 }
-//	----------------------------------------------------------------------
 def setModeCircadian() {
 	log.info "${device.name} ${device.label}: Changing Mode to CIRCADIAN"
     sendCmdtoServer('{"smartlife.iot.smartbulb.lightingservice": {"transition_light_state": {"mode": "circadian"}}}', "hubActionResponse")
 }
-//	----------------------------------------------------------------------
 def setColor(Map color) {
 	def hue = color.hue * 3.6 as int
 	def saturation = color.saturation as int
@@ -120,43 +111,37 @@ def setColor(Map color) {
     complexCmd('{"smartlife.iot.smartbulb.lightingservice": {"transition_light_state": {"color_temp": 0, "hue": ' + 
     hue + ', "saturation": ' + saturation + '}}}')
 }
-//	-----------------------------------------------------------------------
 def refresh(){
 	log.info "Polling ${device.name} ${device.label}"
 	sendCmdtoServer('{"system":{"get_sysinfo":{}}}', "hubActionResponse")
 }
-//	--- turns bulb on first if setting level, color_temp, or brightness ---
 def complexCmd(command) {
 	if(device.latestValue("switch") == "off") {
 		sendCmdtoServer('{"smartlife.iot.smartbulb.lightingservice": {"transition_light_state": {"on_off": 1}}}', "nullHubAction")
-        sendCmdtoServer(command, "hubActionResponse")
+		sendCmdtoServer(command, "hubActionResponse")
     } else {
 		sendCmdtoServer(command, "hubActionResponse")}
 }
-//	-----------------------------------------------------------------------
 private sendCmdtoServer(command, action){
 	def headers = [:] 
 	headers.put("HOST", "$gatewayIP:8082")   // port 8082 must be same as value in TP-LInkServerLite.js
 	headers.put("tplink-iot-ip", deviceIP)
 	headers.put("command", command)
 	sendHubCommand(new physicalgraph.device.HubAction([
-		method: "GET",
-		path: "/",
 		headers: headers],
 		device.deviceNetworkId,
 		[callback: action]
 	))
 }
-//	----- null respone for when status is not desired ---------------------
 def nullHubAction(response){
 }
-//	----- Response to determine new state ---------------------------------
 def hubActionResponse(response){
 	def cmdResponse = parseJson(response.headers["cmd-response"])
-	try {
+	String cmdResp = cmdResponse.toString()
+	if (cmdResp.substring(1,10) == "smartlife") {
 		state =  cmdResponse["smartlife.iot.smartbulb.lightingservice"]["transition_light_state"]
-	} catch (e) {
-    	state = cmdResponse.system.get_sysinfo.light_state
+	} else {
+		state = cmdResponse.system.get_sysinfo.light_state
 	}
 	def status = state.on_off
 	if (status == 1) {

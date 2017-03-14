@@ -25,7 +25,6 @@ Notes:
 Update History
 	03/12/2017 - Created initial rendition.  Version 1.0
 */
-//	-----------------------------------------------------------------------
 metadata {
 	definition (name: "TP-Link_LB-100_110_Lite", namespace: "V1.0", author: "Dave Gutheinz") {
 		capability "Switch"
@@ -55,32 +54,26 @@ metadata {
 		details(["switch", "refresh"])
     }
 }
-//	----------------------------------------------------------------------
 preferences {
 	input("deviceIP", "text", title: "Device IP", required: true, displayDuringSetup: true)
 	input("gatewayIP", "text", title: "Gateway IP", required: true, displayDuringSetup: true)
 }
-//	----------------------------------------------------------------------
 def on() {
 	log.info "${device.name} ${device.label}: Turning ON"
 	sendCmdtoServer('{"smartlife.iot.smartbulb.lightingservice": {"transition_light_state": {"on_off": 1}}}', "hubActionResponse")
 }
-//	----------------------------------------------------------------------
 def off() {
 	log.info "${device.name} ${device.label}: Turning OFF"
 	sendCmdtoServer('{"smartlife.iot.smartbulb.lightingservice": {"transition_light_state": {"on_off": 0}}}', "hubActionResponse")
 }
-//	----------------------------------------------------------------------
 def setLevel(percentage) {
 	log.info "${device.name} ${device.label}: Setting Brightness to " + percentage
 	complexCmd('{"smartlife.iot.smartbulb.lightingservice": {"transition_light_state": {"brightness": ' + percentage + '}}}')
 }
-//	-----------------------------------------------------------------------
 def refresh(){
 	log.info "Polling ${device.name} ${device.label}"
 	sendCmdtoServer('{"system":{"get_sysinfo":{}}}', "hubActionResponse")
 }
-//	--- turns bulb on first if setting level, color_temp, or brightness ---
 def complexCmd(command) {
 	if(device.latestValue("switch") == "off") {
 		sendCmdtoServer('{"smartlife.iot.smartbulb.lightingservice": {"transition_light_state": {"on_off": 1}}}', "nullHubAction")
@@ -88,29 +81,25 @@ def complexCmd(command) {
     } else {
 		sendCmdtoServer(command, "hubActionResponse")}
 }
-//	-----------------------------------------------------------------------
 private sendCmdtoServer(command, action){
 	def headers = [:] 
 	headers.put("HOST", "$gatewayIP:8082")   // port 8082 must be same as value in TP-LInkServerLite.js
 	headers.put("tplink-iot-ip", deviceIP)
 	headers.put("command", command)
 	sendHubCommand(new physicalgraph.device.HubAction([
-		method: "GET",
-		path: "/",
 		headers: headers],
 		device.deviceNetworkId,
 		[callback: action]
 	))
 }
-//	----- null respone for when status is not desired ---------------------
 def nullHubAction(response){
 }
-//	----- Response to determine new state ---------------------------------
 def hubActionResponse(response){
 	def cmdResponse = parseJson(response.headers["cmd-response"])
-	try {
+	String cmdResp = cmdResponse.toString()
+	if (cmdResp.substring(1,10) == "smartlife") {
 		state =  cmdResponse["smartlife.iot.smartbulb.lightingservice"]["transition_light_state"]
-	} catch (e) {
+	} else {
     	state = cmdResponse.system.get_sysinfo.light_state
 	}
 	def status = state.on_off

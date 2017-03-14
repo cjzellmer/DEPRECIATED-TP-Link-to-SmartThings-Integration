@@ -24,7 +24,6 @@ Notes:
 Update History
 	03/12/2017 - Created initial rendition.  Version 1.0
 */
-//	-----------------------------------------------------------------------
 metadata {
 	definition (name: "TP-Link_Plug_Switch_Lite", namespace: "V1.0", author: "Dave Gutheinz") {
 		capability "Switch"
@@ -50,46 +49,37 @@ metadata {
 		details(["switch", "refresh"])
     }
 }
-//	----------------------------------------------------------------------
 preferences {
 	input("deviceIP", "text", title: "Device IP", required: true, displayDuringSetup: true)
 	input("gatewayIP", "text", title: "Gateway IP", required: true, displayDuringSetup: true)
 }
-//	----------------------------------------------------------------------
 def on() {
 	log.info "${device.name} ${device.label}: Turning ON"
 	sendCmdtoServer('{"system":{"set_relay_state":{"state": 1}}}', "nullHubAction")
 	sendCmdtoServer('{"system":{"get_sysinfo":{}}}', "hubActionResponse")
 }
-//	----------------------------------------------------------------------
 def off() {
 	log.info "${device.name} ${device.label}: Turning OFF"
 	sendCmdtoServer('{"system":{"set_relay_state":{"state": 0}}}', "nullHubAction")
 	sendCmdtoServer('{"system":{"get_sysinfo":{}}}', "hubActionResponse")
 }
-//	-----------------------------------------------------------------------
 def refresh(){
 	log.info "Polling ${device.name} ${device.label}"
 	sendCmdtoServer('{"system":{"get_sysinfo":{}}}', "hubActionResponse")
 }
-//	-----------------------------------------------------------------------
 private sendCmdtoServer(command, action){
 	def headers = [:] 
 	headers.put("HOST", "$gatewayIP:8082")   // port 8082 must be same as value in TP-LInkServerLite.js
 	headers.put("tplink-iot-ip", deviceIP)
 	headers.put("command", command)
 	sendHubCommand(new physicalgraph.device.HubAction([
-		method: "GET",
-		path: "/",
 		headers: headers],
 		device.deviceNetworkId,
 		[callback: action]
 	))
 }
-//	----- null respone for when status is not desired ---------------------
 def nullHubAction(response){
 }
-//	----- Response to determine new state ---------------------------------
 def hubActionResponse(response){
 	def cmdResponse = parseJson(response.headers["cmd-response"])
 	def status = cmdResponse.system.get_sysinfo.relay_state
