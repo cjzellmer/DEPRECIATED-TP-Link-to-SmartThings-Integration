@@ -1,5 +1,5 @@
 # TP-Link-Smarthings-with-Server
-# (new version with functions in groovy file and server used as HTTP-UDP bridge)
+(new version with functions in groovy file and server used as HTTP-UDP bridge)
 
 This version transfers all bulb functionality to the SmartThings groovy files and then uses the node server (T_-LinkSeverLite.js) as a HTTP to UDP bridge.  The objective is to have a UDP ready device handler for when and if SmartThings starts to support the TP-Link IOT UDP sockets.
 
