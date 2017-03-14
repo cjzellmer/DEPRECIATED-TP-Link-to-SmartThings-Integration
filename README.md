@@ -87,7 +87,7 @@ These instructions assume that you have already downloaded the files from the Sm
 
   o	Device Network Id - enter a unique ID (i.e., “LB100-1”, “LB120-1”, and “LB120-2”).
 
-  o	Type - select the appropriate groovy file from the drop down list (should be at the very bottom of the list).
+  o	Type - select the appropriate groovy file from the drop down list (should be near the bottom of the list).
 
   o	Version - Published
 
