@@ -43,6 +43,8 @@ The Installation files have been greatly reduced from the previous versions and 
 
 •	“Upgrade Instructions.txt” – a file describing how to update an existing installation.
 
+•	“TP-Link Integration Description.pdf” – describes the operation of the installed app on a android smart phone.
+
 These instructions are a modification of those posted by destructure00 on the SmartThings Community forum.  His application was for the TP-Link HS-100 outlets.  These instructions are based my installation and experience.
 Pre-requisites: 
 
