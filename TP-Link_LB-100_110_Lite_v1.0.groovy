@@ -60,15 +60,15 @@ preferences {
 }
 def on() {
 	log.info "${device.name} ${device.label}: Turning ON"
-	sendCmdtoServer('{"smartlife.iot.smartbulb.lightingservice": {"transition_light_state": {"on_off": 1}}}', "hubActionResponse")
+	sendCmdtoServer('{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"on_off": 1}}}', "hubActionResponse")
 }
 def off() {
 	log.info "${device.name} ${device.label}: Turning OFF"
-	sendCmdtoServer('{"smartlife.iot.smartbulb.lightingservice": {"transition_light_state": {"on_off": 0}}}', "hubActionResponse")
+	sendCmdtoServer('{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"on_off": 0}}}', "hubActionResponse")
 }
 def setLevel(percentage) {
-	log.info "${device.name} ${device.label}: Setting Brightness to " + percentage
-	complexCmd('{"smartlife.iot.smartbulb.lightingservice": {"transition_light_state": {"brightness": ' + percentage + '}}}')
+	log.info "${device.name} ${device.label}: Setting Brightness to ${percentage}%"
+	complexCmd("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"brightness": ${percentage}}}}""")
 }
 def refresh(){
 	log.info "Polling ${device.name} ${device.label}"
@@ -76,7 +76,7 @@ def refresh(){
 }
 def complexCmd(command) {
 	if(device.latestValue("switch") == "off") {
-		sendCmdtoServer('{"smartlife.iot.smartbulb.lightingservice": {"transition_light_state": {"on_off": 1}}}', "nullHubAction")
+		sendCmdtoServer('{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"on_off": 1}}}', "nullHubAction")
         sendCmdtoServer(command, "hubActionResponse")
     } else {
 		sendCmdtoServer(command, "hubActionResponse")}
@@ -110,7 +110,7 @@ def hubActionResponse(response){
 		state = state.dft_on_state
 	}
 	def level = state.brightness
-	log.info device.name + " " + device.label + ": Power: " + status + " / Level: " + level
+	log.info "${device.name} ${device.label}: Power: ${status} / Brightness: ${level}%" 
 	sendEvent(name: "switch", value: status, isStateChange: true)
 	sendEvent(name: "level", value: level)
 }

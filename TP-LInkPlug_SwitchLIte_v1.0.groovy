@@ -88,6 +88,6 @@ def hubActionResponse(response){
 	} else {
         status = "off"
 	}
-	log.info device.name + " " + device.label + ": Power: " + status
+	log.info "${device.name} ${device.label}: Power: ${status}"
 	sendEvent(name: "switch", value: status, isStateChange: true)
 }

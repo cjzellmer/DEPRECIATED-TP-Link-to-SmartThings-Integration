@@ -77,27 +77,27 @@ preferences {
 }
 def on() {
 	log.info "${device.name} ${device.label}: Turning ON"
-	sendCmdtoServer('{"smartlife.iot.smartbulb.lightingservice": {"transition_light_state": {"on_off": 1}}}', "hubActionResponse")
+	sendCmdtoServer('{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"on_off": 1}}}', "hubActionResponse")
 }
 def off() {
 	log.info "${device.name} ${device.label}: Turning OFF"
-	sendCmdtoServer('{"smartlife.iot.smartbulb.lightingservice": {"transition_light_state": {"on_off": 0}}}', "hubActionResponse")
+	sendCmdtoServer('{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"on_off": 0}}}', "hubActionResponse")
 }
 def setLevel(percentage) {
-	log.info "${device.name} ${device.label}: Setting Brightness to " + percentage
-	complexCmd('{"smartlife.iot.smartbulb.lightingservice": {"transition_light_state": {"brightness": ' + percentage + '}}}')
+	log.info "${device.name} ${device.label}: Setting Brightness to ${percentage}%"
+	complexCmd("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"brightness": ${percentage}}}}""")
 }
 def setColorTemperature(kelvin) {
-	log.info "${device.name} ${device.label}: Setting Color Temperature to " + kelvin
-    complexCmd('{"smartlife.iot.smartbulb.lightingservice": {"transition_light_state": {"color_temp": ' + kelvin + '}}}')
+	log.info "${device.name} ${device.label}: Setting Color Temperature to ${kelvin}K"
+    complexCmd("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"color_temp": ${kelvin}}}}""")
 }
 def setModeNormal() {
 	log.info "${device.name} ${device.label}: Changing Mode to NORMAL"
-    sendCmdtoServer('{"smartlife.iot.smartbulb.lightingservice": {"transition_light_state": {"mode": "normal"}}}', "hubActionResponse")
+    sendCmdtoServer('{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"mode": "normal"}}}', "hubActionResponse")
 }
 def setModeCircadian() {
 	log.info "${device.name} ${device.label}: Changing Mode to CIRCADIAN"
-    sendCmdtoServer('{"smartlife.iot.smartbulb.lightingservice": {"transition_light_state": {"mode": "circadian"}}}', "hubActionResponse")
+    sendCmdtoServer('{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"mode": "circadian"}}}', "hubActionResponse")
 }
 def refresh(){
 	log.info "Polling ${device.name} ${device.label}"
@@ -141,7 +141,7 @@ def hubActionResponse(response){
 	def mode = state.mode
 	def level = state.brightness
 	def color_temp = state.color_temp
-	log.info device.name + " " + device.label + ": Power: " + status + " / Mode: " + mode + " / Level: " + level + " / Color Temp: " + color_temp 
+	log.info "${device.name} ${device.label}: Power: ${status} / Mode: ${mode} / Brightness: ${level}% / Color Temp: ${color_temp}K" 
 	sendEvent(name: "bulbMode", value: mode, isStateChange: true)
 	sendEvent(name: "switch", value: status, isStateChange: true)
 	sendEvent(name: "level", value: level)

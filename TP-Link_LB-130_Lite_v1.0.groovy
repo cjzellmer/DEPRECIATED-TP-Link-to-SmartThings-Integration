@@ -82,34 +82,33 @@ preferences {
 }
 def on() {
 	log.info "${device.name} ${device.label}: Turning ON"
-	sendCmdtoServer('{"smartlife.iot.smartbulb.lightingservice": {"transition_light_state": {"on_off": 1}}}', "hubActionResponse")
+	sendCmdtoServer('{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"on_off": 1}}}', "hubActionResponse")
 }
 def off() {
 	log.info "${device.name} ${device.label}: Turning OFF"
-	sendCmdtoServer('{"smartlife.iot.smartbulb.lightingservice": {"transition_light_state": {"on_off": 0}}}', "hubActionResponse")
+	sendCmdtoServer('{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"on_off": 0}}}', "hubActionResponse")
 }
 def setLevel(percentage) {
-	log.info "${device.name} ${device.label}: Setting Brightness to " + percentage
-	complexCmd('{"smartlife.iot.smartbulb.lightingservice": {"transition_light_state": {"brightness": ' + percentage + '}}}')
+	log.info "${device.name} ${device.label}: Setting Brightness to ${percentage}%"
+	complexCmd("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"brightness": ${percentage}}}}""")
 }
 def setColorTemperature(kelvin) {
-	log.info "${device.name} ${device.label}: Setting Color Temperature to " + kelvin
-    complexCmd('{"smartlife.iot.smartbulb.lightingservice": {"transition_light_state": {"color_temp": ' + kelvin + '}}}')
+	log.info "${device.name} ${device.label}: Setting Color Temperature to ${kelvin}K"
+    complexCmd("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"color_temp": ${kelvin}}}}""")
 }
 def setModeNormal() {
 	log.info "${device.name} ${device.label}: Changing Mode to NORMAL"
-    sendCmdtoServer('{"smartlife.iot.smartbulb.lightingservice": {"transition_light_state": {"mode": "normal"}}}', "hubActionResponse")
+    sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"mode": "normal"}}}""", "hubActionResponse")
 }
 def setModeCircadian() {
 	log.info "${device.name} ${device.label}: Changing Mode to CIRCADIAN"
-    sendCmdtoServer('{"smartlife.iot.smartbulb.lightingservice": {"transition_light_state": {"mode": "circadian"}}}', "hubActionResponse")
+    sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"mode": "circadian"}}}""", "hubActionResponse")
 }
 def setColor(Map color) {
 	def hue = color.hue * 3.6 as int
 	def saturation = color.saturation as int
-	log.info "${device.name} ${device.label}: Setting bulb Hue: " + hue + " Saturation: " + saturation
-    complexCmd('{"smartlife.iot.smartbulb.lightingservice": {"transition_light_state": {"color_temp": 0, "hue": ' + 
-    hue + ', "saturation": ' + saturation + '}}}')
+	log.info "${device.name} ${device.label}: Setting bulb Hue: ${hue} and Saturation: ${saturation}"
+    complexCmd("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"color_temp": 0, "hue": ${hue}, "saturation": ${saturation}}}}""")
 }
 def refresh(){
 	log.info "Polling ${device.name} ${device.label}"
@@ -139,9 +138,9 @@ def hubActionResponse(response){
 	def cmdResponse = parseJson(response.headers["cmd-response"])
 	String cmdResp = cmdResponse.toString()
 	if (cmdResp.substring(1,10) == "smartlife") {
-		state =  cmdResponse["smartlife.iot.smartbulb.lightingservice"]["transition_light_state"]
+	state =  cmdResponse["smartlife.iot.smartbulb.lightingservice"]["transition_light_state"]
 	} else {
-		state = cmdResponse.system.get_sysinfo.light_state
+    	state = cmdResponse.system.get_sysinfo.light_state
 	}
 	def status = state.on_off
 	if (status == 1) {
@@ -155,7 +154,7 @@ def hubActionResponse(response){
 	def color_temp = state.color_temp
 	def hue = state.hue //as int
 	def saturation = state.saturation //as int
-	log.info device.name + " " + device.label + ": Power: " + status + " / Mode: " + mode + " / Level: " + level + " / Color Temp: " + color_temp + " / Hue: " + hue + " / Saturation: " + saturation
+	log.info "${device.name} ${device.label}: Power: ${status} / Mode: ${mode} / Brightness: ${level}% / Color Temp: ${color_temp}K / Hue: ${hue} / Saturation: ${saturation}"
 	sendEvent(name: "bulbMode", value: mode, isStateChange: true)
 	sendEvent(name: "switch", value: status, isStateChange: true)
 	sendEvent(name: "level", value: level)
