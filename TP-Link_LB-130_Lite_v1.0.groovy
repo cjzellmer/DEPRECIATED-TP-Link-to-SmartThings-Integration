@@ -94,21 +94,21 @@ def setLevel(percentage) {
 }
 def setColorTemperature(kelvin) {
 	log.info "${device.name} ${device.label}: Setting Color Temperature to ${kelvin}K"
-    complexCmd("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"color_temp": ${kelvin}}}}""")
+	complexCmd("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"color_temp": ${kelvin}, "hue": 0, "saturation": 0}}}""")
 }
 def setModeNormal() {
 	log.info "${device.name} ${device.label}: Changing Mode to NORMAL"
-    sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"mode": "normal"}}}""", "hubActionResponse")
+	sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"mode": "normal"}}}""", "hubActionResponse")
 }
 def setModeCircadian() {
 	log.info "${device.name} ${device.label}: Changing Mode to CIRCADIAN"
-    sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"mode": "circadian"}}}""", "hubActionResponse")
+	sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"mode": "circadian"}}}""", "hubActionResponse")
 }
 def setColor(Map color) {
 	def hue = color.hue * 3.6 as int
 	def saturation = color.saturation as int
 	log.info "${device.name} ${device.label}: Setting bulb Hue: ${hue} and Saturation: ${saturation}"
-    complexCmd("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"color_temp": 0, "hue": ${hue}, "saturation": ${saturation}}}}""")
+	complexCmd("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"color_temp": 0, "hue": ${hue}, "saturation": ${saturation}}}}""")
 }
 def refresh(){
 	log.info "Polling ${device.name} ${device.label}"
