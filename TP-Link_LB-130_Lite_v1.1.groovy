@@ -100,7 +100,7 @@ def setLevel(percentage) {
 		sendCmdtoServer('{"smartlife.iot.smartbulb.lightingservice": {"transition_light_state": {"on_off": 1}}}', "onAction")
 		sendEvent(name: "switch", value: "turningOn", isStateChange: true)
 		sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"brightness":${percentage}}}}""", "hubActionResponse")
-    } else {
+	} else {
 		sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"brightness":${percentage}}}}""", "hubActionResponse")}
 }
 def setColorTemperature(kelvin) {
@@ -109,16 +109,16 @@ def setColorTemperature(kelvin) {
 		sendCmdtoServer('{"smartlife.iot.smartbulb.lightingservice": {"transition_light_state": {"on_off": 1}}}', "onAction")
 		sendEvent(name: "switch", value: "turningOn", isStateChange: true)
 		sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"color_temp": ${kelvin}}}}""", "hubActionResponse")
-    } else {
+	} else {
 		sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"color_temp": ${kelvin},"hue":0,"saturation":0}}}""", "hubActionResponse")}
 }
 def setModeNormal() {
 	log.info "${device.name} ${device.label}: Changing Mode to NORMAL"
-    sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"mode":"normal"}}}""", "hubActionResponse")
+	sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"mode":"normal"}}}""", "hubActionResponse")
 }
 def setModeCircadian() {
 	log.info "${device.name} ${device.label}: Changing Mode to CIRCADIAN"
-    sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"mode":"circadian"}}}""", "hubActionResponse")
+	sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"mode":"circadian"}}}""", "hubActionResponse")
 }
 def setColor(Map color) {
 	def hue = color.hue * 3.6 as int
@@ -128,7 +128,7 @@ def setColor(Map color) {
 		sendCmdtoServer('{"smartlife.iot.smartbulb.lightingservice": {"transition_light_state": {"on_off": 1}}}', "onAction")
 		sendEvent(name: "switch", value: "turningOn", isStateChange: true)
 		sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"color_temp":0,"hue":${hue},"saturation":${saturation}}}}""", "hubActionResponse")
-    } else {
+	} else {
 		sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"color_temp":0,"hue":${hue},"saturation":${saturation}}}}""", "hubActionResponse")}
 }
 def refresh(){
