@@ -23,22 +23,25 @@ Notes:
 
 Update History
 	03/12/2017 - Created initial rendition.  Version 1.0
+	03/30/2017 - Version 1.1.  Rearranged some functions.  Added color coding to
+			     indicate switch/plug is turning on or off.  Added some notes.	
+
 */
 metadata {
-	definition (name: "TP-Link_Plug_Switch_Lite", namespace: "V1.0", author: "Dave Gutheinz") {
+	definition (name: "TP-Link_Plug_Switch_Lite", namespace: "V1.1", author: "Dave Gutheinz") {
 		capability "Switch"
 		capability "refresh"
 	}
 	tiles {
 		multiAttributeTile(name:"switch", type: "lighting", width: 6, height: 4, canChangeIcon: true){
 			tileAttribute ("device.switch", key: "PRIMARY_CONTROL") {
-				attributeState "on", label:'${name}', action:"switch.off", icon:"st.switches.light.on", backgroundColor:"#79b821",
+				attributeState "on", label:'${name}', action:"switch.off", icon:"st.switches.light.on", backgroundColor:"#00a0dc",
 				nextState:"turningOff"
 				attributeState "off", label:'${name}', action:"switch.on", icon:"st.switches.light.off", backgroundColor:"#ffffff",
 				nextState:"turningOn"
-				attributeState "turningOn", label:'${name}', action:"switch.off", icon:"st.switches.light.on", backgroundColor:"#79b821",
+				attributeState "turningOn", label:'${name}', action:"switch.off", icon:"st.switches.light.on", backgroundColor:"#efd90f",
 				nextState:"turningOff"
-				attributeState "turningOff", label:'${name}', action:"switch.on", icon:"st.switches.light.off", backgroundColor:"#ffffff",
+				attributeState "turningOff", label:'${name}', action:"switch.on", icon:"st.switches.light.off", backgroundColor:"#efd90f",
 				nextState:"turningOn"
 			}
 		}
@@ -56,29 +59,31 @@ preferences {
 def on() {
 	log.info "${device.name} ${device.label}: Turning ON"
 	sendCmdtoServer('{"system":{"set_relay_state":{"state": 1}}}', "nullHubAction")
-	sendCmdtoServer('{"system":{"get_sysinfo":{}}}', "hubActionResponse")
 }
 def off() {
 	log.info "${device.name} ${device.label}: Turning OFF"
 	sendCmdtoServer('{"system":{"set_relay_state":{"state": 0}}}', "nullHubAction")
-	sendCmdtoServer('{"system":{"get_sysinfo":{}}}', "hubActionResponse")
 }
 def refresh(){
 	log.info "Polling ${device.name} ${device.label}"
 	sendCmdtoServer('{"system":{"get_sysinfo":{}}}', "hubActionResponse")
 }
+//	Send the command and switch/plug IP to the server.
 private sendCmdtoServer(command, action){
-	def headers = [:] 
+	def headers = [:]
 	headers.put("HOST", "$gatewayIP:8082")   // port 8082 must be same as value in TP-LInkServerLite.js
 	headers.put("tplink-iot-ip", deviceIP)
 	headers.put("command", command)
-	sendHubCommand(new physicalgraph.device.HubAction([
-		headers: headers],
-		device.deviceNetworkId,
-		[callback: action]
+	sendHubCommand(new physicalgraph.device.HubAction(
+		[headers: headers],
+ 		device.deviceNetworkId,
+ 		[callback: action]
 	))
 }
+//	Once command is received, request status via refresh.
 def nullHubAction(response){
+	log.info "On/Off command response received from server!"
+	refresh()
 }
 def hubActionResponse(response){
 	def cmdResponse = parseJson(response.headers["cmd-response"])

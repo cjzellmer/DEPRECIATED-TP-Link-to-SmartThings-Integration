@@ -1,5 +1,5 @@
 /*
-TP-Link LB-100 and LB-110 Lite Version 1.0
+TP-Link_LB-100_110 Lite Version 1.0
 
 Copyright 2017 Dave Gutheinz
 
@@ -17,16 +17,20 @@ Notes:
 1.	This Device Handler requires an operating Windows 10 PC (server) that interfaces 
 	to the TP-Link Bulbs.
 2.	This DH will work only with the TP-LinkServerLite.js server node.
-3.	This handler is for the TP-Link LB-100 and LB-110 bulbs.  This handler support the 
-	following LB-100 and LB-110 functions:
+3.	This handler is for the TP-Link LB-130 bulb.  This handler support the following 
+	LB-100 and LB-110 functions:
 	a.	On/Off
-	b.	Brightness,
-
+	b.	Brightness
+4.	Known issues:
+	a.	Occasionally, the brightness command gets out-of-sync
+    	when being sent with the on command.
 Update History
 	03/12/2017 - Created initial rendition.  Version 1.0
+    03/30/2017 - Version 1.1.  Rearranged some functions.  Added color coding to
+                 indicate bulb is turning on or off.  Added some notes.
 */
 metadata {
-	definition (name: "TP-Link_LB-100_110_Lite", namespace: "V1.0", author: "Dave Gutheinz") {
+	definition (name: "TP-Link_LB-100_110_Lite", namespace: "V1.1", author: "Dave Gutheinz") {
 		capability "Switch"
 		capability "Switch Level"
 		capability "refresh"
@@ -34,24 +38,24 @@ metadata {
 	tiles {
 		multiAttributeTile(name:"switch", type: "lighting", width: 6, height: 4, canChangeIcon: true){
 			tileAttribute ("device.switch", key: "PRIMARY_CONTROL") {
-				attributeState "on", label:'${name}', action:"switch.off", icon:"st.switches.light.on", backgroundColor:"#79b821",
+				attributeState "on", label:'${name}', action:"switch.off", icon:"st.switches.light.on", backgroundColor:"#00a0dc",
 				nextState:"turningOff"
 				attributeState "off", label:'${name}', action:"switch.on", icon:"st.switches.light.off", backgroundColor:"#ffffff",
 				nextState:"turningOn"
-				attributeState "turningOn", label:'${name}', action:"switch.off", icon:"st.switches.light.on", backgroundColor:"#79b821",
-				nextState:"turningOff"
-				attributeState "turningOff", label:'${name}', action:"switch.on", icon:"st.switches.light.off", backgroundColor:"#ffffff",
-				nextState:"turningOn"
+				attributeState "turningOn", label:'${name}', action:"switch.off", icon:"st.switches.light.on", backgroundColor:"#efd90f",
+				nextState:"on"
+				attributeState "turningOff", label:'${name}', action:"switch.on", icon:"st.switches.light.off", backgroundColor:"#efd90f",
+				nextState:"off"
 			}
 			tileAttribute ("device.level", key: "SLIDER_CONTROL") {
 				attributeState "level", label: "Brightness: ${currentValue}", action:"switch level.setLevel"
 			}
 		}
 		standardTile("refresh", "capability.refresh", width: 2, height: 2,  decoration: "flat") {
-			state ("default", label:"Refresh", action:"refresh.refresh", icon:"st.secondary.refresh")
+			state ("default", label:"Refresh", action:"refresh.refresh", icon:"st.secondary.refresh", backgroundColor:"#ffffff")
 		}         
 		main("switch")
-		details(["switch", "refresh"])
+		details(["switch", "colorTempSliderControl", "bulbMode", "colorTemp", "refresh"])
     }
 }
 preferences {
@@ -60,27 +64,28 @@ preferences {
 }
 def on() {
 	log.info "${device.name} ${device.label}: Turning ON"
-	sendCmdtoServer('{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"on_off": 1}}}', "hubActionResponse")
+	sendCmdtoServer('{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"on_off":1}}}', "hubActionResponse")
 }
 def off() {
 	log.info "${device.name} ${device.label}: Turning OFF"
-	sendCmdtoServer('{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"on_off": 0}}}', "hubActionResponse")
+	sendCmdtoServer('{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"on_off":0}}}', "hubActionResponse")
 }
+//	If bulb is off, turn on prior to setting brightness (level) or color_temp.
+//  When originating from here, the ON command will not be parsed by the handler.
 def setLevel(percentage) {
 	log.info "${device.name} ${device.label}: Setting Brightness to ${percentage}%"
-	complexCmd("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"brightness": ${percentage}}}}""")
+ 	if(device.latestValue("switch") == "off") {
+		sendCmdtoServer('{"smartlife.iot.smartbulb.lightingservice": {"transition_light_state": {"on_off": 1}}}', "onAction")
+    	sendEvent(name: "switch", value: "turningOn", isStateChange: true)
+		sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"brightness":${percentage}}}}""", "hubActionResponse")
+    } else {
+		sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"brightness":${percentage}}}}""", "hubActionResponse")}
 }
 def refresh(){
 	log.info "Polling ${device.name} ${device.label}"
 	sendCmdtoServer('{"system":{"get_sysinfo":{}}}', "hubActionResponse")
 }
-def complexCmd(command) {
-	if(device.latestValue("switch") == "off") {
-		sendCmdtoServer('{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"on_off": 1}}}', "nullHubAction")
-        sendCmdtoServer(command, "hubActionResponse")
-    } else {
-		sendCmdtoServer(command, "hubActionResponse")}
-}
+//	Send the command and bulb IP to the server.  Callback is in hubActionResponse.
 private sendCmdtoServer(command, action){
 	def headers = [:] 
 	headers.put("HOST", "$gatewayIP:8082")   // port 8082 must be same as value in TP-LInkServerLite.js
@@ -92,25 +97,32 @@ private sendCmdtoServer(command, action){
 		[callback: action]
 	))
 }
-def nullHubAction(response){
+def onAction(response){
+	log.info "On command response returned from bulb."
 }
 def hubActionResponse(response){
+//	hubActionResponse must handle two different return message, each
+//	message in two different formats (based on power state).
 	def cmdResponse = parseJson(response.headers["cmd-response"])
 	String cmdResp = cmdResponse.toString()
-	if (cmdResp.substring(1,10) == "smartlife") {
-		state =  cmdResponse["smartlife.iot.smartbulb.lightingservice"]["transition_light_state"]
-	} else {
+	if (cmdResp.substring(1,10) == "smartlife") {	//	Automatic message from light state commands.
+	state =  cmdResponse["smartlife.iot.smartbulb.lightingservice"]["transition_light_state"]
+	} else {		// Automatic message from refresh commands.
     	state = cmdResponse.system.get_sysinfo.light_state
 	}
 	def status = state.on_off
-	if (status == 1) {
+	if (status == 1) {		// Addresses format when bulb is ON.
 		status = "on"
-	} else {
+	} else {		// Addresses format when bulb is OFF.
         status = "off"
 		state = state.dft_on_state
 	}
+	def mode = state.mode
 	def level = state.brightness
-	log.info "${device.name} ${device.label}: Power: ${status} / Brightness: ${level}%" 
+	def color_temp = state.color_temp
+	def hue = state.hue //as int
+	def saturation = state.saturation //as int
+	log.info "${device.name} ${device.label}: Power: ${status} / Brightness: ${level}%"
 	sendEvent(name: "switch", value: status, isStateChange: true)
-	sendEvent(name: "level", value: level)
+	sendEvent(name: "level", value: level, isStateChange: true)
 }
