@@ -98,7 +98,7 @@ def setLevel(percentage) {
 	log.info "${device.name} ${device.label}: Setting Brightness to ${percentage}%"
  	if(device.latestValue("switch") == "off") {
 		sendCmdtoServer('{"smartlife.iot.smartbulb.lightingservice": {"transition_light_state": {"on_off": 1}}}', "onAction")
-    	sendEvent(name: "switch", value: "turningOn", isStateChange: true)
+		sendEvent(name: "switch", value: "turningOn", isStateChange: true)
 		sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"brightness":${percentage}}}}""", "hubActionResponse")
     } else {
 		sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"brightness":${percentage}}}}""", "hubActionResponse")}
@@ -107,7 +107,7 @@ def setColorTemperature(kelvin) {
 	log.info "${device.name} ${device.label}: Setting Color Temperature to ${kelvin}K"
 	if(device.latestValue("switch") == "off") {
 		sendCmdtoServer('{"smartlife.iot.smartbulb.lightingservice": {"transition_light_state": {"on_off": 1}}}', "onAction")
-    	sendEvent(name: "switch", value: "turningOn", isStateChange: true)
+		sendEvent(name: "switch", value: "turningOn", isStateChange: true)
 		sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"color_temp": ${kelvin}}}}""", "hubActionResponse")
     } else {
 		sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"color_temp": ${kelvin},"hue":0,"saturation":0}}}""", "hubActionResponse")}
@@ -126,7 +126,7 @@ def setColor(Map color) {
 	log.info "${device.name} ${device.label}: Setting bulb Hue: ${hue} and Saturation: ${saturation}"
 	if(device.latestValue("switch") == "off") {
 		sendCmdtoServer('{"smartlife.iot.smartbulb.lightingservice": {"transition_light_state": {"on_off": 1}}}', "onAction")
-    	sendEvent(name: "switch", value: "turningOn", isStateChange: true)
+		sendEvent(name: "switch", value: "turningOn", isStateChange: true)
 		sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"color_temp":0,"hue":${hue},"saturation":${saturation}}}}""", "hubActionResponse")
     } else {
 		sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"color_temp":0,"hue":${hue},"saturation":${saturation}}}}""", "hubActionResponse")}
