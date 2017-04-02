@@ -101,7 +101,8 @@ def setLevel(percentage) {
 		sendEvent(name: "switch", value: "turningOn", isStateChange: true)
 		sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"brightness":${percentage}}}}""", "hubActionResponse")
 	} else {
-		sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"brightness":${percentage}}}}""", "hubActionResponse")}
+		sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"brightness":${percentage}}}}""", "hubActionResponse")
+	}
 }
 def setColorTemperature(kelvin) {
 	log.info "${device.name} ${device.label}: Setting Color Temperature to ${kelvin}K"
@@ -110,7 +111,8 @@ def setColorTemperature(kelvin) {
 		sendEvent(name: "switch", value: "turningOn", isStateChange: true)
 		sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"color_temp": ${kelvin}}}}""", "hubActionResponse")
 	} else {
-		sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"color_temp": ${kelvin},"hue":0,"saturation":0}}}""", "hubActionResponse")}
+		sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"color_temp": ${kelvin},"hue":0,"saturation":0}}}""", "hubActionResponse")
+	}
 }
 def setModeNormal() {
 	log.info "${device.name} ${device.label}: Changing Mode to NORMAL"
@@ -129,7 +131,8 @@ def setColor(Map color) {
 		sendEvent(name: "switch", value: "turningOn", isStateChange: true)
 		sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"color_temp":0,"hue":${hue},"saturation":${saturation}}}}""", "hubActionResponse")
 	} else {
-		sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"color_temp":0,"hue":${hue},"saturation":${saturation}}}}""", "hubActionResponse")}
+		sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"color_temp":0,"hue":${hue},"saturation":${saturation}}}}""", "hubActionResponse")
+	}
 }
 def refresh(){
 	log.info "Polling ${device.name} ${device.label}"
