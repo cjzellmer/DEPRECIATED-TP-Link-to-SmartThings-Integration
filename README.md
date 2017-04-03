@@ -22,7 +22,9 @@ Features:
       4.  LB-120 bulb, ON/OFF, Brightness, Color Temperature, and Circadian mode (tested)
       
       5.  LB-130 bulb, LB-120 functions plus Color using color wheel (tested)
-      
+   
+  c.  Visual indication of a TP-Link device off-line.
+     
 The Installation files have been greatly reduced from the previous versions and include:
 
 •	“cmdPrompt.bat” – a MS Windows batch file that will start a window with a command prompt.
@@ -33,13 +35,13 @@ The Installation files have been greatly reduced from the previous versions and 
 
 •	“TP-LinkServerLite.bat” – a MS Windows server start file.
 
-•	“TP-LInkPlug_SwitchLIte_v1.0.groovy” – SmartThings Device Handler for all TP-Link Plugs and Switches.
+•	“TP-LInk_Plug_Switch_v1.2.groovy” – SmartThings Device Handler for all TP-Link Plugs and Switches.
 
-•	“TP-Link_LB-100_110_Lite_v1.0.grooy” – SmartThings Device Handler for the TP-Link LB-100 and LB-110 bulbs.
+•	“TP-Link_LB-100_110_v1.2.grooy” – SmartThings Device Handler for the TP-Link LB-100 and LB-110 bulbs.
 
-•	“TP-Link_LB-120_Lite_v1.0.grooy” – SmartThings Device Handler for the TP-Link L1-20 bulbs.
+•	“TP-Link_LB-120_v1.2.grooy” – SmartThings Device Handler for the TP-Link L1-20 bulbs.
 
-•	“TP-Link_LB-130_Lite_v1.0.grooy” – SmartThings Device Handler for the TP-Link LB-130 bulbs.
+•	“TP-Link_LB-130_v1.2.grooy” – SmartThings Device Handler for the TP-Link LB-130 bulbs.
 
 •	“Upgrade Instructions.txt” – a file describing how to update an existing installation.
 
