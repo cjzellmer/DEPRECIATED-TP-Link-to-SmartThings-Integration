@@ -15,13 +15,14 @@ var net = require('net')
 var server = http.createServer(onRequest)
 server.listen(8082) // port must be same as in "sendCmdtoServer" of groovy files.
 console.log("TP-Link Server - Lite Edition")
+//-- For each request received from the SmartThings. -------------------
 function onRequest(request, response){
 	var deviceIP = request.headers["tplink-iot-ip"]
 	var command = request.headers["command"]
-//Add Bridge Version check here with new request header "bridge-version".
 	console.log(" ")
 	console.log(new Date())
 	console.log("Sending to IP address: " + deviceIP + " Command: " + command)
+//--- Encrypt then send command to device and wait for response. -------
 	return new Promise((resolve, reject) => {
 		var socket = net.connect(9999, deviceIP)
 		socket.setKeepAlive(false)
@@ -29,6 +30,7 @@ function onRequest(request, response){
    	 	socket.on('connect', () => {
   			socket.write(encrypt(command))
    	 	})
+//-- Decrypt response (less header) then send to SmartThings. ----------
 		socket.on('data', (data) => {
 			data = decrypt(data.slice(4)).toString('ascii')
 			console.log("Command Response sent to SmartThings!")
@@ -36,6 +38,7 @@ function onRequest(request, response){
 			response.end()
 			socket.end()
 			resolve(data)
+//-- If a timeout, send a timeout indication to SmartThings. -----------
 		}).on('timeout', () => {
 			socket.end()
 			response.setHeader("cmd-response", '{"error":"TCP Timeout"}')
@@ -47,6 +50,7 @@ function onRequest(request, response){
 		})
 		
 	})
+//-- Encrypt the command including a 4 byte TCP header. ----------------
 	function encrypt(input) {
 		var buf = Buffer.alloc(input.length)
 		var key = 0xAB
@@ -58,6 +62,7 @@ function onRequest(request, response){
 		bufLength.writeUInt32BE(input.length, 0)
 		return Buffer.concat([bufLength, buf], input.length + 4)
 	}
+//--- Decrypt the response. --------------------------------------------
 	function decrypt(input, firstKey) {
 		var buf = Buffer.from(input)
 		var key = 0x2B

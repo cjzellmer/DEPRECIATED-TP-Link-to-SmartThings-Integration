@@ -19,9 +19,9 @@ Notes:
 	Plug and Switch On/Off.
 
 Update History
-	03/12/2017 - Created initial rendition.  Version 1.0
-	03/30/2017 - Version 1.1.  Rearranged some functions.  Added color coding to
-			     indicate switch/plug is turning on or off.  Added some notes.	
+	03/12/2017	- Created initial rendition.  Version 1.0
+	03/30/2017	- Version 1.1.  Rearranged some functions.  Added color coding to
+			  indicate switch/plug is turning on or off.  Added some notes.	
 
 */
 metadata {
@@ -30,6 +30,7 @@ metadata {
 		capability "refresh"
 	}
 	tiles {
+//-- Switch (on/off) Tile - off: white, on: blue, turning on/off: yellow, offine: red -----
 		multiAttributeTile(name:"switch", type: "lighting", width: 6, height: 4, canChangeIcon: true){
 			tileAttribute ("device.switch", key: "PRIMARY_CONTROL") {
 				attributeState "on", label:'${name}', action:"switch.off", icon:"st.switches.light.on", backgroundColor:"#00a0dc",
@@ -55,18 +56,22 @@ preferences {
 	input("deviceIP", "text", title: "Device IP", required: true, displayDuringSetup: true)
 	input("gatewayIP", "text", title: "Gateway IP", required: true, displayDuringSetup: true)
 }
+//-- ON -----------------------------------------------------------------------------------
 def on() {
 	log.info "${device.name} ${device.label}: Turning ON"
-	sendCmdtoServer('{"system":{"set_relay_state":{"state": 1}}}', "nullHubAction")
+	sendCmdtoServer('{"system":{"set_relay_state":{"state": 1}}}', "onOffResponse")
 }
+//-- OFF ----------------------------------------------------------------------------------
 def off() {
 	log.info "${device.name} ${device.label}: Turning OFF"
-	sendCmdtoServer('{"system":{"set_relay_state":{"state": 0}}}', "nullHubAction")
+	sendCmdtoServer('{"system":{"set_relay_state":{"state": 0}}}', "onOffResponse")
 }
+//-- Refresh ------------------------------------------------------------------------------
 def refresh(){
 	log.info "Polling ${device.name} ${device.label}"
 	sendCmdtoServer('{"system":{"get_sysinfo":{}}}', "hubActionResponse")
 }
+//-- Send the command to the Bridge.  Callback defined in the sendCmdtoServer command. ----
 private sendCmdtoServer(command, action){
 	def headers = [:]
 	headers.put("HOST", "$gatewayIP:8082")   // port 8082 must be same as value in TP-LInkServerLite.js
@@ -78,10 +83,13 @@ private sendCmdtoServer(command, action){
  		[callback: action]
 	))
 }
-def nullHubAction(response){
+//-- Callback onOffResponse - use for on/off cmds.  Then calls refresh to get status.  -----
+def onOffResponse(response){
 	log.info "On/Off command response received from server!"
 	refresh()
 }
+//-- Callback hubActionResponse - the command response is different than the refresh. -----
+//-- Also, check for a bulb TCP time-out and set switch state to alert user. --------------
 def hubActionResponse(response){
 	def cmdResponse = parseJson(response.headers["cmd-response"])
 	if (cmdResponse.error == "TCP Timeout") {
