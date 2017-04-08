@@ -22,24 +22,6 @@ function onRequest(request, response){
 	console.log(" ")
 	console.log(new Date())
 	var command = request.headers["command"]
-//-- Bridge to SmartThings comms. Poll and restart. --------------------
-	if(request.headers["command"] == "resetBridge"){
-		console.log("Bridge restarting")
-		response.setHeader("cmd-response", "restart")
-		response.end()
-		const exec = require('child_process').exec;
-		exec('shutdown /r /t 005')
-	} else if(request.headers["command"] == "pollBridge"){
-		response.setHeader("cmd-response", "on")
-		console.log("Bridge poll response sent to SmartThings")
-		response.end()
-	} else {
-		controlDevices(request, response)
-	}
-}
-//-- Parse device commands, send, and parse returns. -----------------------
-function controlDevices (request, response) {
-	var command = request.headers["command"]
 	var deviceIP = request.headers["tplink-iot-ip"]
 	console.log("Sending to IP address: " + deviceIP + " Command: " + command)
 //--- Encrypt then send command to device and wait for response. -------
