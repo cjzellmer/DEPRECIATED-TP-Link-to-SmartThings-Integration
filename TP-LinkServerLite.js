@@ -1,5 +1,5 @@
 /*
-TP-linkServerLite.js V1.2.
+TP-linkServerLite.js V2.0.
 This is a lite version of a node.js server supporting TP-Link Devices.  This node server will:
 a.  receive raw TP-Link device commands from SmartThings.
 b.  encrypt and then send the command to the TP-Link device.
@@ -9,6 +9,8 @@ History:
 04-02-2017 - Ver 1.2.  Changed TCP timeout to 2 secs. Added error message that 
              will be sent to SmartThings if TCP timeout is attained indicating a 
              bulb off-line. Integrated TCP functions into onRequest. 
+04-07-2017	- Ver 2.0.  Added Bridge command capability.  To work, requires Bridge
+		  device handler installation on server.
 */
 var http = require('http')
 var net = require('net')
@@ -17,10 +19,28 @@ server.listen(8082) // port must be same as in "sendCmdtoServer" of groovy files
 console.log("TP-Link Server - Lite Edition")
 //-- For each request received from the SmartThings. -------------------
 function onRequest(request, response){
-	var deviceIP = request.headers["tplink-iot-ip"]
-	var command = request.headers["command"]
 	console.log(" ")
 	console.log(new Date())
+	var command = request.headers["command"]
+//-- Bridge to SmartThings comms. Poll and restart. --------------------
+	if(request.headers["command"] == "resetBridge"){
+		console.log("Bridge restarting")
+		response.setHeader("cmd-response", "restart")
+		response.end()
+		const exec = require('child_process').exec;
+		exec('shutdown /r /t 005')
+	} else if(request.headers["command"] == "pollBridge"){
+		response.setHeader("cmd-response", "on")
+		console.log("Bridge poll response sent to SmartThings")
+		response.end()
+	} else {
+		controlDevices(request, response)
+	}
+}
+//-- Parse device commands, send, and parse returns. -----------------------
+function controlDevices (request, response) {
+	var command = request.headers["command"]
+	var deviceIP = request.headers["tplink-iot-ip"]
 	console.log("Sending to IP address: " + deviceIP + " Command: " + command)
 //--- Encrypt then send command to device and wait for response. -------
 	return new Promise((resolve, reject) => {
