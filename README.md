@@ -105,7 +105,9 @@ These instructions assume that you have already downloaded the files from the Sm
 
 10.	Now that your device is created, specify the IP addresses for your gateway PC and each device (bulb or plug). To do this, click on "edit" next to Preferences (or find the outlet in your list of Things in the ST app, and go to settings).
 
-11.	Enter the IP addresses for the device (plug or bulb) and gateway PC. Click Save. 
+11.	Enter the IP addresses for the device (plug or bulb) and gateway PC. Click Save.
+
+12. If you are installing the bridge, enter the Bridge IP (same as gateway IP) and the Bridge Port (8082 for this application).
 
 # Notes on keeping the application running on your PC
 
