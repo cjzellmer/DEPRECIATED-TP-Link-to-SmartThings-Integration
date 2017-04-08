@@ -3,6 +3,8 @@
 
 This version transfers all bulb functionality to the SmartThings groovy files and then uses the node server (T_-LinkSeverLite.js) as a HTTP to UDP bridge.  The objective is to have a UDP ready device handler for when and if SmartThings starts to support the TP-Link IOT UDP sockets.
 
+Version 2.0.  Added functionality to detect a TP-Link device off-line.  Added a NodeJSBridge Device Handler and code in TP-LinkServerLite.js to allow refreshing status and restarting bridge (these will only work if the bridge and software are already working).  The NodeJSBridge Device Handler is OPTIONAL.
+
 These instructions are designed for an initial installation of the TP-Link Internet of Things (IOT) devices into the SmartThings environment.  
 
 Features:
@@ -24,6 +26,8 @@ Features:
       5.  LB-130 bulb, LB-120 functions plus Color using color wheel (tested)
    
   c.  Visual indication of a TP-Link device off-line.
+  
+  d.  A NodeJSBridge device handler to allow checking status of bridge software and restarting bridge, if desired (this will not restart the bridge if the node software is not running or is locked).
      
 The Installation files have been greatly reduced from the previous versions and include:
 
@@ -35,15 +39,15 @@ The Installation files have been greatly reduced from the previous versions and 
 
 •	“TP-LinkServerLite.bat” – a MS Windows server start file.
 
-•	“TP-LInk_Plug_Switch_v1.2.groovy” – SmartThings Device Handler for all TP-Link Plugs and Switches.
+•	“TP-LInk_Plug_Switch_v2.0.groovy” – SmartThings Device Handler for all TP-Link Plugs and Switches.
 
-•	“TP-Link_LB-100_110_v1.2.grooy” – SmartThings Device Handler for the TP-Link LB-100 and LB-110 bulbs.
+•	“TP-Link_LB-100_110_v2.0.grooy” – SmartThings Device Handler for the TP-Link LB-100 and LB-110 bulbs.
 
-•	“TP-Link_LB-120_v1.2.grooy” – SmartThings Device Handler for the TP-Link L1-20 bulbs.
+•	“TP-Link_LB-120_v2.0.grooy” – SmartThings Device Handler for the TP-Link L1-20 bulbs.
 
-•	“TP-Link_LB-130_v1.2.grooy” – SmartThings Device Handler for the TP-Link LB-130 bulbs.
+•	“TP-Link_LB-130_v12.0.grooy” – SmartThings Device Handler for the TP-Link LB-130 bulbs.
 
-•	“Upgrade Instructions.txt” – a file describing how to update an existing installation.
+•	“NodeJSBridge_v2.0” – a Bridge device handler to see and refresh status of bridge.
 
 •	“TP-Link Integration Description.pdf” – describes the operation of the installed app on a android smart phone.
 
@@ -67,9 +71,9 @@ These instructions assume that you have already downloaded the files from the Sm
 
 1.	Install node.js. Link here: https://nodejs.org/en/download/  (note - make sure you get the msi installer package, not just the exe binary)
 
-2.	Place the above 8 files into a directory of your choice.  Examples in these instructions, will use: “C:\\TPLinkIoT”
+2.	Place the above files into a directory of your choice.  Examples in these instructions, will use: “C:\\TPLink”
 
-3.	Open the batch file “TPLinkIoTServerStart.bat” for editing.  Change the first line to change the directory to the location your TPLinkBulb files were paced (i.e., “CD c:\\TPLinkIoT”).
+3.	Open the batch file “TP-LinkServerLite.bat” for editing.  Change the first line to change the directory to the location your TPLinkBulb files were paced (i.e., “CD c:\\TPLink”).
 
 4.	Test the server by starting the batch file “TP-LinkServerLite.bat”.  This should start the server in a separate window on your display.
 
