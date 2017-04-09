@@ -35,7 +35,6 @@ metadata {
 		command "setModeCircadian"
 	}
 	tiles {
-//-- Switch (on/off) Tile - off: white, on: blue, turning on/off: yellow, offine: red -----
 		multiAttributeTile(name:"switch", type: "lighting", width: 6, height: 4, canChangeIcon: true){
 			tileAttribute ("device.switch", key: "PRIMARY_CONTROL") {
 				attributeState "on", label:'${name}', action:"switch.off", icon:"st.switches.light.on", backgroundColor:"#00a0dc",
@@ -60,7 +59,6 @@ metadata {
 		valueTile("colorTemp", "device.colorTemperature", inactiveLabel: false, decoration: "flat", height: 1, width: 4) {
 			state "colorTemp", label: 'ColorTemp: ${currentValue}K'
 		}
-//-- Mode Tile - normal: white, circadian: blue ------------------------------------------
 		standardTile("bulbMode", "bulbMode", width: 2, height: 2) {
 			state "normal", label:'Normal', action:"setModeCircadian", backgroundColor:"#ffffff", nextState: "circadian"
 			state "circadian", label:'Circadian', action:"setModeNormal", backgroundColor:"#00a0dc", nextState: "normal"
@@ -76,17 +74,14 @@ preferences {
 	input("deviceIP", "text", title: "Device IP", required: true, displayDuringSetup: true)
 	input("gatewayIP", "text", title: "Gateway IP", required: true, displayDuringSetup: true)
 }
-//-- ON -----------------------------------------------------------------------------------
 def on() {
 	log.info "${device.name} ${device.label}: Turning ON"
 	sendCmdtoServer('{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"on_off":1}}}', "commandResponse")
 }
-//-- OFF -----------------------------------------------------------------------------------
 def off() {
 	log.info "${device.name} ${device.label}: Turning OFF"
 	sendCmdtoServer('{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"on_off":0}}}', "commandResponse")
 }
-//-- Set Level (brightness) - If bulb is off, turn on first. -------------------------------
 def setLevel(percentage) {
 	log.info "${device.name} ${device.label}: Setting Brightness to ${percentage}%"
  	if(device.latestValue("switch") == "off") {
@@ -97,7 +92,6 @@ def setLevel(percentage) {
 		sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"brightness":${percentage}}}}""", "commandResponse")
 	}
 }
-//-- Set Color Temperature - If bulb is off, turn on first. -------------------------------
 def setColorTemperature(kelvin) {
 	log.info "${device.name} ${device.label}: Setting Color Temperature to ${kelvin}K"
 	if(device.latestValue("switch") == "off") {
@@ -108,25 +102,21 @@ def setColorTemperature(kelvin) {
 		sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"color_temp": ${kelvin},"hue":0,"saturation":0}}}""", "commandResponse")
 	}
 }
-//-- Set Mode Normal ----------------------------------------------------------------------
 def setModeNormal() {
 	log.info "${device.name} ${device.label}: Changing Mode to NORMAL"
 	sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"mode":"normal"}}}""", "commandResponse")
 }
-//-- Set Mode Circadian -------------------------------------------------------------------
 def setModeCircadian() {
 	log.info "${device.name} ${device.label}: Changing Mode to CIRCADIAN"
 	sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"mode":"circadian"}}}""", "commandResponse")
 }
-//-- Refresh ------------------------------------------------------------------------------
 def refresh(){
 	log.info "Polling ${device.name} ${device.label}"
 	sendCmdtoServer('{"system":{"get_sysinfo":{}}}', "refreshResponse")
 }
-//-- Send the command to the Bridge.  Callback defined in the sendCmdtoServer command. ----
 private sendCmdtoServer(command, action){
 	def headers = [:] 
-	headers.put("HOST", "$gatewayIP:8082")   // port 8082 must be same as value in TP-LInkServerLite.js
+	headers.put("HOST", "$gatewayIP:8082")   // port 8082 must be same as value in TP-LInkServer.js
 	headers.put("tplink-iot-ip", deviceIP)
 	headers.put("command", command)
 	sendHubCommand(new physicalgraph.device.HubAction([
@@ -135,12 +125,9 @@ private sendCmdtoServer(command, action){
 		[callback: action]
 	))
 }
-//-- Callback onAction - use when turning on bulb while setting other params.  ------------
 def onAction(response){
 	log.info "On command response returned from bulb."
 }
-//-- Callback commandResponse - the command response is different than the refresh. -------
-//-- Also, check for a bulb TCP time-out and set switch state to alert user. --------------
 def commandResponse(response){
 	def cmdResponse = parseJson(response.headers["cmd-response"])
 	if (cmdResponse.error == "TCP Timeout") {
@@ -151,7 +138,6 @@ def commandResponse(response){
 		parseStatus(state)
 	}
 }
-//-- Callback refreshResponse -------------------------------------------------------------
 def refreshResponse(response){
 	def cmdResponse = parseJson(response.headers["cmd-response"])
 	if (cmdResponse.error == "TCP Timeout") {
@@ -162,7 +148,6 @@ def refreshResponse(response){
 		parseStatus(state)
 	}
 }
-//-- Parse Status - Status return format is different if the bulb s on vs off. ----------
 def parseStatus(state){
 	def status = state.on_off
 	if (status == 1) {
@@ -175,7 +160,6 @@ def parseStatus(state){
 	def level = state.brightness
 	def color_temp = state.color_temp
 	log.info "$device.name $device.label: Power: ${status} / Mode: ${mode} / Brightness: ${level}% / Color Temp: ${color_temp}K"
-//-- Update the tuneable bulb parameters. ----------------------------------------------
 	sendEvent(name: "switch", value: status, isStateChange: true)
 	sendEvent(name: "bulbMode", value: mode, isStateChange: true)
 	sendEvent(name: "level", value: level, isStateChange: true)

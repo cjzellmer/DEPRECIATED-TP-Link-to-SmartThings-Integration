@@ -4,7 +4,9 @@ TP-Link_LB-130 Version 2.0
 Copyright 2017 Dave Gutheinz
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this 
 file except in compliance with the License. You may obtain a copy of the License at:
+
 		http://www.apache.org/licenses/LICENSE-2.0
+        
 Unless required by applicable law or agreed to in writing, software distributed under 
 the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF 
 ANY KIND, either express or implied. See the License for the specific language governing 
@@ -19,10 +21,10 @@ Notes:
 Update History
 	03/12/2017	- Created initial rendition.  Version 1.0
 	03/30/2017	- Version 1.12.  Rearranged some functions.  Added color coding to
-			  indicate bulb is turning on or off.  Added some notes.
+			      indicate bulb is turning on or off.  Added some notes.
 	04/07/2017	- Version 2.0.  Added messaging for bridge to device TCP timeout. 
-			  Added new power state indicating these two problems. Created
-			  dedicated call-back for commands versus status refresh.
+			      Added new power state indicating these two problems. Created
+			      dedicated call-back for commands versus status refresh.
 */
 metadata {
 	definition (name: "TP-Link LB-130", namespace: "V2.0", author: "Dave Gutheinz") {
@@ -36,7 +38,6 @@ metadata {
 		command "setModeCircadian"
 	}
 	tiles {
-//-- Switch (on/off) Tile - off: white, on: blue, turning on/off: yellow, offine: red -----
 		multiAttributeTile(name:"switch", type: "lighting", width: 6, height: 4, canChangeIcon: true){
 			tileAttribute ("device.switch", key: "PRIMARY_CONTROL") {
 				attributeState "on", label:'${name}', action:"switch.off", icon:"st.switches.light.on", backgroundColor:"#00a0dc",
@@ -64,7 +65,6 @@ metadata {
 		valueTile("colorTemp", "device.colorTemperature", inactiveLabel: false, decoration: "flat", height: 1, width: 4) {
 			state "colorTemp", label: 'ColorTemp: ${currentValue}K'
 		}
-//-- Mode Tile - normal: white, circadian: blue ------------------------------------------
 		standardTile("bulbMode", "bulbMode", width: 2, height: 2) {
 			state "normal", label:'Normal', action:"setModeCircadian", backgroundColor:"#ffffff", nextState: "circadian"
 			state "circadian", label:'Circadian', action:"setModeNormal", backgroundColor:"#00a0dc", nextState: "normal"
@@ -80,17 +80,14 @@ preferences {
 	input("deviceIP", "text", title: "Device IP", required: true, displayDuringSetup: true)
 	input("gatewayIP", "text", title: "Gateway IP", required: true, displayDuringSetup: true)
 }
-//-- ON -----------------------------------------------------------------------------------
 def on() {
 	log.info "${device.name} ${device.label}: Turning ON"
 	sendCmdtoServer('{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"on_off":1}}}', "commandResponse")
 }
-//-- OFF -----------------------------------------------------------------------------------
 def off() {
 	log.info "${device.name} ${device.label}: Turning OFF"
 	sendCmdtoServer('{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"on_off":0}}}', "commandResponse")
 }
-//-- Set Level (brightness) - If bulb is off, turn on first. -------------------------------
 def setLevel(percentage) {
 	log.info "${device.name} ${device.label}: Setting Brightness to ${percentage}%"
  	if(device.latestValue("switch") == "off") {
@@ -101,7 +98,6 @@ def setLevel(percentage) {
 		sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"brightness":${percentage}}}}""", "commandResponse")
 	}
 }
-//-- Set Color Temperature - If bulb is off, turn on first. -------------------------------
 def setColorTemperature(kelvin) {
 	log.info "${device.name} ${device.label}: Setting Color Temperature to ${kelvin}K"
 	if(device.latestValue("switch") == "off") {
@@ -112,17 +108,14 @@ def setColorTemperature(kelvin) {
 		sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"color_temp": ${kelvin},"hue":0,"saturation":0}}}""", "commandResponse")
 	}
 }
-//-- Set Mode Normal ----------------------------------------------------------------------
 def setModeNormal() {
 	log.info "${device.name} ${device.label}: Changing Mode to NORMAL"
 	sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"mode":"normal"}}}""", "commandResponse")
 }
-//-- Set Mode Circadian -------------------------------------------------------------------
 def setModeCircadian() {
 	log.info "${device.name} ${device.label}: Changing Mode to CIRCADIAN"
 	sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"mode":"circadian"}}}""", "commandResponse")
 }
-//-- Set Bulb Color - I bulb is off, turn on first. ---------------------------------------
 def setColor(Map color) {
 	def hue = color.hue * 3.6 as int
 	def saturation = color.saturation as int
@@ -135,12 +128,10 @@ def setColor(Map color) {
 		sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"color_temp":0,"hue":${hue},"saturation":${saturation}}}}""", "commandResponse")
 	}
 }
-//-- Refresh ------------------------------------------------------------------------------
 def refresh(){
 	log.info "Polling ${device.name} ${device.label}"
 	sendCmdtoServer('{"system":{"get_sysinfo":{}}}', "refreshResponse")
 }
-//-- Send the command to the Bridge.  Callback defined in the sendCmdtoServer command. ----
 private sendCmdtoServer(command, action){
 	def headers = [:] 
 	headers.put("HOST", "$gatewayIP:8082")   // port 8082 must be same as value in TP-LInkServerLite.js
@@ -152,12 +143,9 @@ private sendCmdtoServer(command, action){
 		[callback: action]
 	))
 }
-//-- Callback onAction - use when turning on bulb while setting other params.  ------------
 def onAction(response){
 	log.info "On command response returned from bulb."
 }
-//-- Callback commandResponse - the command response is different than the refresh. -------
-//-- Also, check for a bulb TCP time-out and set switch state to alert user. --------------
 def commandResponse(response){
 	def cmdResponse = parseJson(response.headers["cmd-response"])
 	if (cmdResponse.error == "TCP Timeout") {
@@ -168,7 +156,6 @@ def commandResponse(response){
 		parseStatus(state)
 	}
 }
-//-- Callback refreshResponse -------------------------------------------------------------
 def refreshResponse(response){
 	def cmdResponse = parseJson(response.headers["cmd-response"])
 	if (cmdResponse.error == "TCP Timeout") {
@@ -179,7 +166,6 @@ def refreshResponse(response){
 		parseStatus(state)
 	}
 }
-//-- Parse Status - Status return format is different if the bulb s on vs off. ----------
 def parseStatus(state){
 	def status = state.on_off
 	if (status == 1) {
@@ -194,7 +180,6 @@ def parseStatus(state){
 	def hue = state.hue
 	def saturation = state.saturation
 	log.info "$device.name $device.label: Power: ${status} / Mode: ${mode} / Brightness: ${level}% / Color Temp: ${color_temp}K / Hue: ${hue} / Saturation: ${saturation}"
-//-- Update the color bulb parameters. --------------------------------------------------
 	sendEvent(name: "switch", value: status, isStateChange: true)
 	sendEvent(name: "bulbMode", value: mode, isStateChange: true)
 	sendEvent(name: "level", value: level, isStateChange: true)
