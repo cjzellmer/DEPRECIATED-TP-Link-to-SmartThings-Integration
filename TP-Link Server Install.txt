@@ -38,7 +38,7 @@ COPY FILES TO THE SERVER PC
 
 2.	Open the batch file "TP-LinkServer.bat" and edit to change the directory to where the files were copied.
 
-3.	Test the server by starting the batch file “TP-LinkServerLite.bat”.  This should start the server in a separate window on your display.
+3.	Test the server by starting the batch file “TP-LinkServer.bat”.  This should start the server in a separate window on your display.
 
 ENABLE DEVICE ON SMARTTHINGS
 
