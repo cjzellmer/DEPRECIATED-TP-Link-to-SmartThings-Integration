@@ -85,8 +85,6 @@ private sendCmdtoServer(command, action){
 }
 def onOffResponse(response){
 	log.info "On/Off command response received from server!"
-	log.error response.ip
-    log.error response.mac
 	refresh()
 }
 def refreshResponse(response){
