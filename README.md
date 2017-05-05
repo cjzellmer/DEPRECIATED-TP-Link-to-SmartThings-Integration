@@ -4,8 +4,11 @@ Version 2.3 with some user status functions.
 This version transfers all bulb functionality to the SmartThings groovy files and then uses the node server (T_-LinkSever.js) as a HTTP to UDP bridge.  The objective is to have a UDP ready device handler for when and if SmartThings starts to support the TP-Link IOT UDP sockets.
 
 Version 2.0.  Added functionality to detect a TP-Link device off-line plus in interface to the TP-LinkBridge device handler.
+
 Version 2.1.  Added bridge device interface, interfacing to the separate bridge.  Allows restart of the PC bridge from ST.
+
 Version 2.2.  Integrate command parameter "ignore_default" into command stream.
+
 Version 2.3.  Fixed problem with Amazon Echo - ST - TP-Link Bulbs integration (due to updates in Echo-ST stream).
 
 These instructions are designed for an initial installation of the TP-Link Internet of Things (IOT) devices into the SmartThings environment.  
