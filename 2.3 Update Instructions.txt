@@ -4,6 +4,9 @@ Who should upgrade:
 	Persons who use Amazon Echo (Alexa) to command bulbs.
 	Persons with 2.0 through 2.1 installation who have had any problems.
 
+Note:  You MUST upgrade the entire package.  The 2.0 Server file is not compatible
+       with the later groovy files and vica versa.!
+
 Upgrade Instructions:
 	1.	Go to the SmartThings Developer community and log on.
 	2.	Open the current Device Handler.
@@ -11,8 +14,13 @@ Upgrade Instructions:
 		the data in the current file.
 	4.	SAVE
 	5.	PUBLISH FOR ME.
+	6.	Replace your "TP-LinkServer.js" file with the current one at this site.
 
 Upgrade notes from version 2.0
+
+Version 2.0	The "TP-LinkServer.js" file for Version 2.0 will NOT work with that for
+		later versions!!.  Additionally, the 2.1 groovy files will not work with
+		the 2.0 server file.
 
 Version 2.1.	General update to add bridge capability.  This adds a 
 			"bridge" device. Through the bridge, you can monitor the
