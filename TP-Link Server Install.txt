@@ -9,15 +9,15 @@ d.	The device handlers (one for each device type you use) that implement the TP-
 
 INSTALLATION FILES
 
-•	“TP-Link Server Install.txt” - these installation instructions.
-•	“TP-LinkServer.js” – the single node.js server script.
-•	“TP-LinkServer.bat” – a MS Windows server start file.
-•	“TP-LInk_Plug_Switch.groovy” – SmartThings Device Handler.
-•	“TP-Link_LB-100_110.grooy” – SmartThings Device Handler.
-•	“TP-Link_LB-120.grooy” – SmartThings Device Handler.
-•	“TP-Link_LB-130.grooy” – SmartThings Device Handler.
-•	“TP-Link Server Description.pdf” – operational description.
-•	“cmdPrompt.bat” - windows command prompt.
+â€¢	â€œTP-Link Server Install.txtâ€ - these installation instructions.
+â€¢	â€œTP-LinkServer.jsâ€ â€“ the single node.js server script.
+â€¢	â€œTP-LinkServer.batâ€ â€“ a MS Windows server start file.
+â€¢	â€œTP-LInk_Plug_Switch.groovyâ€ â€“ SmartThings Device Handler.
+â€¢	â€œTP-Link_LB-100_110.grooyâ€ â€“ SmartThings Device Handler.
+â€¢	â€œTP-Link_LB-120.grooyâ€ â€“ SmartThings Device Handler.
+â€¢	â€œTP-Link_LB-130.grooyâ€ â€“ SmartThings Device Handler.
+â€¢	â€œTP-Link Server Description.pdfâ€ â€“ operational description.
+â€¢	â€œcmdPrompt.batâ€ - windows command prompt.
 
 PRE-REQUISITES
 
@@ -32,13 +32,37 @@ Install this utility from this link directly.  Ensure that you get the "msi" ins
 
 	https://nodejs.org/en/download/
 
+BUG ISSUE.  There is a problem with the latest version of node.js working with this set of applications.  Not sure what causes it, I only know that adding some console.log lines got the program working and then reloading the original file worked fine.  Could not duplicate (even after re-installing node.js).
+
+Potential fixes
+
+1.  Reboot your PC after installing the packages and noting a failure.
+
+2.  try adding the line "console.log("This is a bogus line") after the line sequence below:
+
+//--- Encrypt then send command to device and wait for response. -------
+
+	return new Promise((resolve, reject) => {
+	
+		var socket = net.connect(9999, deviceIP)
+		
+		socket.setKeepAlive(false)
+		
+		socket.setTimeout(2000)  // 2 seconds.
+		
+   	 	socket.on('connect', () => {
+		
+  			socket.write(encrypt(command))
+
+
+
 COPY FILES TO THE SERVER PC
 
 1.	Copy the files to a convenient location on your server PC.  My install was at "C:\\TPLink" which greatly shortened the path in the batch files.
 
 2.	Open the batch file "TP-LinkServer.bat" and edit to change the directory to where the files were copied.
 
-3.	Test the server by starting the batch file “TP-LinkServer.bat”.  This should start the server in a separate window on your display.
+3.	Test the server by starting the batch file â€œTP-LinkServer.batâ€.  This should start the server in a separate window on your display.
 
 ENABLE DEVICE ON SMARTTHINGS
 
@@ -52,12 +76,12 @@ ENABLE DEVICE ON SMARTTHINGS
 
 5.	Past the contents into the the IDE window.  Select "Create" at the bottom.
 
-7.	On the next page that opens, click “Publish”, then “For Me” near the top-right of the page. 
+7.	On the next page that opens, click â€œPublishâ€, then â€œFor Meâ€ near the top-right of the page. 
 
 8.	Go to "My Devices" in IDE, click on New Device in the top right corner (you will repeat this step for each of the outlets you have)
-  o	Name - enter a name for the product *i.e., “TP-Link HS-100", "TP-Link HS-200", "TP-Link LB-120", TP-Link LB-130").
-  o	Label - enter a label, this is what will show in the SmartThings app, (i.e., “Den Lamp”, "Bedroom Fan").
-  o	Device Network Id - enter a unique ID (i.e., “LB100-1”, “LB120-1”, and “LB120-2”).
+  o	Name - enter a name for the product *i.e., â€œTP-Link HS-100", "TP-Link HS-200", "TP-Link LB-120", TP-Link LB-130").
+  o	Label - enter a label, this is what will show in the SmartThings app, (i.e., â€œDen Lampâ€, "Bedroom Fan").
+  o	Device Network Id - enter a unique ID (i.e., â€œLB100-1â€, â€œLB120-1â€, and â€œLB120-2â€).
   o	Type - select the appropriate groovy file from the drop down list (should be near the bottom of the list).
   o	Version - Published
   o	Location and Hub - select for your setup
@@ -84,7 +108,7 @@ b.	a Router that allows you to reserve IP addresses (i.e., set up static IP)
 
 Steps
 
-1.	On your PC.  You have already modified the “TP-LinkServer.bat” for your path.  Use this file below.
+1.	On your PC.  You have already modified the â€œTP-LinkServer.batâ€ for your path.  Use this file below.
 	a.	Go to Windows Scheduler (Control Panel -> System and Security -> Administrative Tools -> Task Scheduler)
 	b.	Add a task to schedule "TP-LinkServer.bat" to start every time you log on.
 	c.	Set Windows to automatically Log you in.  See site :
