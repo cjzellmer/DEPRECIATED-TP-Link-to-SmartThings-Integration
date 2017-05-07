@@ -1,6 +1,8 @@
 # TP-Link-Smarthings-with-Server
 Version 2.3 with some user status functions.
 
+BUG:  There is a bug in installation with the latest version of node.js.  The 'TP-LinkServer.js' applet will not send the TCP command.  While troubleshooting, the problem was resolved by adding tracking messages after the send command.  It then worked.  Subsequently, it worked with the original file???????  Still working to find the reason for this.
+
 This version transfers all bulb functionality to the SmartThings groovy files and then uses the node server (T_-LinkSever.js) as a HTTP to UDP bridge.  The objective is to have a UDP ready device handler for when and if SmartThings starts to support the TP-Link IOT UDP sockets.
 
 Version 2.0.  Added functionality to detect a TP-Link device off-line plus in interface to the TP-LinkBridge device handler.
