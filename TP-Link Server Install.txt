@@ -54,7 +54,9 @@ Potential fixes
 		
   			socket.write(encrypt(command))
 
+ADD LINE HERE "console.log("this is a bogus line")
 
+I am working to determine what is causing this issue.
 
 COPY FILES TO THE SERVER PC
 
