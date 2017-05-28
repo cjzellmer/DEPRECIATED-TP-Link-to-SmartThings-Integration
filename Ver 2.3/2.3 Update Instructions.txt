@@ -1,0 +1,29 @@
+Upgrade Instruction for version 2.3.
+
+Who should upgrade:
+	Persons who use Amazon Echo (Alexa) to command bulbs.
+	Persons with 2.0 through 2.1 installation who have had any problems.
+
+Upgrade Instructions:
+	1.	Go to the SmartThings Developer community and log on.
+	2.	Open the current Device Handler.
+	3.	Copy the contents of the new device handler file (replacing
+		the data in the current file.
+	4.	SAVE
+	5.	PUBLISH FOR ME.
+
+Upgrade notes from version 2.0
+
+Version 2.1.	General update to add bridge capability.  This adds a 
+			"bridge" device. Through the bridge, you can monitor the
+			status of the Node.js applications and also RESTART the
+			bridge.
+
+Version 2.2	Integrated the parameter "ignore_default" into the
+			commands.  Allows sending of on along with other
+			parameters, reducing number of commands sent.
+
+Version 2.3	Fixed problem with Alexa Voice Command changes.  These
+			changed to provide brightnes with decimals (i.e., 10.1 
+			versus 10).  The bulbs reject 10.0 and set the bulb to
+			0 brightness (lowest dim level).
